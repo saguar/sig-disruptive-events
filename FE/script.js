@@ -15,9 +15,14 @@ manualInputBtn.addEventListener('click', () => {
 
 dashboardBtn.addEventListener('click', () => {
     const isHidden = dashboardSection.style.display === 'none';
-    dashboardSection.style.display = isHidden ? 'block' : 'none';
     manualSection.style.display = 'none';
     csvSection.style.display = 'none';
+    if (isHidden) {
+        const sampleData = [10, 8, 12, 9, 11, 7, 6, 5, 9, 10, 8, 7];
+        drawCharts(sampleData);
+    } else {
+        dashboardSection.style.display = 'none';
+    }
 });
 
 uploadCsvBtn.addEventListener('click', () => {
@@ -63,3 +68,47 @@ function renderCsvTable(data) {
     manualSection.style.display = 'none';
     dashboardSection.style.display = 'none';
 }
+
+function drawCharts(monthlyTotals, workingDays = 252) {
+    const months = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
+    const barCtx = document.getElementById('barChart').getContext('2d');
+    new Chart(barCtx, {
+        type: 'bar',
+        data: {
+            labels: months.slice(0, monthlyTotals.length),
+            datasets: [{
+                label: 'Totale ponderato',
+                data: monthlyTotals,
+                backgroundColor: 'rgba(75, 192, 192, 0.6)'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    const totalEvents = monthlyTotals.reduce((sum, v) => sum + v, 0);
+    const disruptiveDays = Math.min(totalEvents, workingDays);
+    const pieCtx = document.getElementById('pieChart').getContext('2d');
+    new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Giorni con eventi disruptive', 'Giorni senza eventi'],
+            datasets: [{
+                data: [disruptiveDays, workingDays - disruptiveDays],
+                backgroundColor: ['rgba(255, 99, 132, 0.6)', 'rgba(201, 203, 207, 0.6)']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    manualSection.style.display = 'none';
+    csvSection.style.display = 'none';
+    dashboardSection.style.display = 'block';
+}
+
+window.drawCharts = drawCharts;

@@ -17,6 +17,12 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
 
+// Ensure the config directory exists
+const configDir = path.join(__dirname, 'config');
+if (!fs.existsSync(configDir)) {
+  fs.mkdirSync(configDir);
+}
+
 // Multer configuration to store uploaded CSV files
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => cb(null, uploadDir),
@@ -32,6 +38,41 @@ const csvFilter = (_req, file, cb) => {
 };
 
 const upload = multer({ storage, fileFilter: csvFilter });
+
+// Endpoint to read the configuration with event weights
+app.get('/config', (_req, res) => {
+  const configPath = path.join(configDir, 'config.json');
+
+  fs.readFile(configPath, 'utf8', (err, fileContents) => {
+    if (err) {
+      console.error('Error reading config file:', err);
+      return res.status(500).json({ error: 'Failed to read configuration' });
+    }
+
+    try {
+      const config = JSON.parse(fileContents);
+      res.json(config);
+    } catch (parseErr) {
+      console.error('Error parsing config JSON:', parseErr);
+      res.status(500).json({ error: 'Invalid JSON format' });
+    }
+  });
+});
+
+// Endpoint to save updated weights to the configuration file
+app.post('/config', (req, res) => {
+  const configPath = path.join(configDir, 'config.json');
+  const newConfig = req.body;
+
+  fs.writeFile(configPath, JSON.stringify(newConfig, null, 2), err => {
+    if (err) {
+      console.error('Error saving config file:', err);
+      return res.status(500).json({ error: 'Failed to save configuration' });
+    }
+
+    res.json({ message: 'Configuration saved successfully' });
+  });
+});
 
 // Endpoint to read a JSON file from the data directory
 app.get('/data', (_req, res) => {

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signature Event Management</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #manualInput, #dashboard { display: none; margin-top: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        table, th, td { border: 1px solid #ccc; }
+        th, td { padding: 8px; text-align: left; }
+    </style>
+</head>
+<body>
+    <h1>Signature Event Management</h1>
+    <button id="uploadCsvBtn">Carica File CSV</button>
+    <button id="manualInputBtn">Inserisci Dati Manualmente</button>
+    <button id="dashboardBtn">Visualizza Dashboard</button>
+
+    <section id="manualInput">
+        <h2>Inserimento Manuale</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Valore</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Righe inserimento dati -->
+                <tr>
+                    <td><input type="text" name="name"></td>
+                    <td><input type="number" name="value"></td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section id="dashboard">
+        <h2>Dashboard</h2>
+        <canvas id="barChart" width="400" height="200"></canvas>
+        <canvas id="pieChart" width="400" height="200"></canvas>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

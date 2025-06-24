@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcolo Totali Mensili</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 15px; }
+        th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: center; }
+        th { background-color: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <h1>Totali Mensili</h1>
+    <table id="dataTable">
+        <thead>
+            <tr>
+                <th>Mese</th>
+                <th>Severity 1 case</th>
+                <th>ProM Critical Alert</th>
+                <th>ProM Warning Alert</th>
+                <th>System Outage</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Gennaio</td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+            </tr>
+            <tr>
+                <td>Febbraio</td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+            </tr>
+            <tr>
+                <td>Marzo</td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+            </tr>
+            <tr>
+                <td>Aprile</td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+            </tr>
+            <tr>
+                <td>Maggio</td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+            </tr>
+            <tr>
+                <td>Giugno</td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+            </tr>
+            <tr>
+                <td>Luglio</td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+            </tr>
+            <tr>
+                <td>Agosto</td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+            </tr>
+            <tr>
+                <td>Settembre</td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+            </tr>
+            <tr>
+                <td>Ottobre</td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+            </tr>
+            <tr>
+                <td>Novembre</td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+            </tr>
+            <tr>
+                <td>Dicembre</td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+                <td contenteditable="true"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <button id="calcBtn">Calcola Totali</button>
+    <div id="results"></div>
+
+    <script>
+    document.getElementById('calcBtn').addEventListener('click', () => {
+        const weights = {
+            s1: 1.4,
+            critical: 0.15,
+            warning: 0.05,
+            outage: 2.0
+        };
+        const rows = document.querySelectorAll('#dataTable tbody tr');
+        const resultsDiv = document.getElementById('results');
+        resultsDiv.innerHTML = '';
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            const mese = cells[0].textContent.trim();
+            const severity1 = parseFloat(cells[1].textContent) || 0;
+            const critical = parseFloat(cells[2].textContent) || 0;
+            const warning = parseFloat(cells[3].textContent) || 0;
+            const outage = parseFloat(cells[4].textContent) || 0;
+            const total = severity1 * weights.s1 +
+                          critical * weights.critical +
+                          warning * weights.warning +
+                          outage * weights.outage;
+            const p = document.createElement('p');
+            p.textContent = `${mese}: ${total.toFixed(2)}`;
+            resultsDiv.appendChild(p);
+        });
+    });
+    </script>
+</body>
+</html>

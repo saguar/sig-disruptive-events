@@ -45,13 +45,13 @@ const upload = multer({
 });
 
 // Endpoint to read the configuration with event weights
-app.get('/config', (_req, res) => {
+app.get('/config', (_req, res, next) => {
   const configPath = path.join(configDir, 'config.json');
 
   fs.readFile(configPath, 'utf8', (err, fileContents) => {
     if (err) {
       console.error('Error reading config file:', err);
-      return res.status(500).json({ error: 'Failed to read configuration' });
+      return next(err);
     }
 
     try {
@@ -59,13 +59,13 @@ app.get('/config', (_req, res) => {
       res.json(config);
     } catch (parseErr) {
       console.error('Error parsing config JSON:', parseErr);
-      res.status(500).json({ error: 'Invalid JSON format' });
+      next(parseErr);
     }
   });
 });
 
 // Endpoint to save updated weights to the configuration file
-app.post('/config', (req, res) => {
+app.post('/config', (req, res, next) => {
   const configPath = path.join(configDir, 'config.json');
   const newConfig = req.body;
 
@@ -84,7 +84,7 @@ app.post('/config', (req, res) => {
   fs.writeFile(configPath, JSON.stringify(newConfig, null, 2), err => {
     if (err) {
       console.error('Error saving config file:', err);
-      return res.status(500).json({ error: 'Failed to save configuration' });
+      return next(err);
     }
 
     res.json({ message: 'Configuration saved successfully' });
@@ -92,13 +92,13 @@ app.post('/config', (req, res) => {
 });
 
 // Endpoint to read a JSON file from the data directory
-app.get('/data', (_req, res) => {
+app.get('/data', (_req, res, next) => {
   const dataPath = path.join(__dirname, 'data', 'data.json');
 
   fs.readFile(dataPath, 'utf8', (err, fileContents) => {
     if (err) {
       console.error('Error reading JSON file:', err);
-      return res.status(500).json({ error: 'Failed to read data' });
+      return next(err);
     }
 
     try {
@@ -106,13 +106,13 @@ app.get('/data', (_req, res) => {
       res.json(jsonData);
     } catch (parseErr) {
       console.error('Error parsing JSON:', parseErr);
-      res.status(500).json({ error: 'Invalid JSON format' });
+      next(parseErr);
     }
   });
 });
 
 // Endpoint to save JSON data sent from the frontend
-app.post('/data', (req, res) => {
+app.post('/data', (req, res, next) => {
   const dataDir = path.join(__dirname, 'data');
   if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir);
@@ -124,7 +124,7 @@ app.post('/data', (req, res) => {
   fs.writeFile(dataPath, JSON.stringify(jsonData, null, 2), err => {
     if (err) {
       console.error('Error saving JSON file:', err);
-      return res.status(500).json({ error: 'Failed to save data' });
+      return next(err);
     }
 
     res.json({ message: 'Data saved successfully' });
@@ -132,14 +132,14 @@ app.post('/data', (req, res) => {
 });
 
 // Endpoint to upload a CSV file
-app.post('/upload', (req, res) => {
+app.post('/upload', (req, res, next) => {
   upload.single('file')(req, res, err => {
     if (err) {
       if (err.code === 'LIMIT_FILE_SIZE') {
         return res.status(400).json({ error: 'File size exceeds limit' });
       }
       console.error('Error uploading file:', err);
-      return res.status(500).json({ error: 'Failed to upload file' });
+      return next(err);
     }
 
     if (!req.file) {
@@ -152,6 +152,12 @@ app.post('/upload', (req, res) => {
 
 // Handle unknown routes with a JSON 404 response
 app.use((req, res) => res.status(404).json({ error: 'Not found' }));
+
+// Final error handler
+app.use((err, _req, res, _next) => {
+  console.error('Unhandled error:', err);
+  res.status(500).json({ error: 'Internal Server Error' });
+});
 
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);

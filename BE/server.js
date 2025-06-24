@@ -38,7 +38,11 @@ const csvFilter = (_req, file, cb) => {
   cb(isCsv ? null : new Error('Only CSV files are allowed'), isCsv);
 };
 
-const upload = multer({ storage, fileFilter: csvFilter });
+const upload = multer({
+  storage,
+  fileFilter: csvFilter,
+  limits: { fileSize: 2 * 1024 * 1024 }
+});
 
 // Endpoint to read the configuration with event weights
 app.get('/config', (_req, res) => {
@@ -128,12 +132,22 @@ app.post('/data', (req, res) => {
 });
 
 // Endpoint to upload a CSV file
-app.post('/upload', upload.single('file'), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: 'No file uploaded' });
-  }
+app.post('/upload', (req, res) => {
+  upload.single('file')(req, res, err => {
+    if (err) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ error: 'File size exceeds limit' });
+      }
+      console.error('Error uploading file:', err);
+      return res.status(500).json({ error: 'Failed to upload file' });
+    }
 
-  res.json({ message: 'File uploaded successfully', filename: req.file.filename });
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    res.json({ message: 'File uploaded successfully', filename: req.file.filename });
+  });
 });
 
 app.listen(PORT, () => {

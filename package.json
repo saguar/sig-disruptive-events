@@ -1,0 +1,15 @@
+{
+  "name": "sig-disruptive-events",
+  "version": "1.0.0",
+  "description": "",
+  "main": "BE/server.js",
+  "scripts": {
+    "start": "node BE/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "multer": "^1.4.4"
+  },
+  "type": "commonjs"
+}

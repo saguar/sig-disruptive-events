@@ -7,6 +7,10 @@ const dashboardSection = document.getElementById('dashboard');
 const csvSection = document.getElementById('csvData');
 const csvTable = document.getElementById('csvTable');
 
+// Hold references to the chart instances so they can be destroyed
+let barChartInstance = null;
+let pieChartInstance = null;
+
 manualInputBtn.addEventListener('click', () => {
     const isHidden = manualSection.style.display === 'none';
     manualSection.style.display = isHidden ? 'block' : 'none';
@@ -77,7 +81,11 @@ function renderCsvTable(data) {
 function drawCharts(monthlyTotals, workingDays = 252) {
     const months = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
     const barCtx = document.getElementById('barChart').getContext('2d');
-    new Chart(barCtx, {
+    // Destroy previous charts to prevent overlap
+    if (barChartInstance) {
+        barChartInstance.destroy();
+    }
+    barChartInstance = new Chart(barCtx, {
         type: 'bar',
         data: {
             labels: months.slice(0, monthlyTotals.length),
@@ -96,7 +104,10 @@ function drawCharts(monthlyTotals, workingDays = 252) {
     const totalEvents = monthlyTotals.reduce((sum, v) => sum + v, 0);
     const disruptiveDays = Math.min(totalEvents, workingDays);
     const pieCtx = document.getElementById('pieChart').getContext('2d');
-    new Chart(pieCtx, {
+    if (pieChartInstance) {
+        pieChartInstance.destroy();
+    }
+    pieChartInstance = new Chart(pieCtx, {
         type: 'pie',
         data: {
             labels: ['Giorni con eventi disruptive', 'Giorni senza eventi'],

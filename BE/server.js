@@ -5,7 +5,8 @@ const multer = require('multer');
 const fs = require('fs');
 
 const app = express();
-const PORT = 3000;
+// Environment variable overrides the default port
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());

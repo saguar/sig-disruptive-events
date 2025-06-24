@@ -65,6 +65,18 @@ app.post('/config', (req, res) => {
   const configPath = path.join(configDir, 'config.json');
   const newConfig = req.body;
 
+  const { s1, critical, warning, outage } = newConfig;
+  const numericFields = [s1, critical, warning, outage];
+  const isValid = numericFields.every(
+    value => typeof value === 'number' && !Number.isNaN(value)
+  );
+
+  if (!isValid) {
+    return res
+      .status(400)
+      .json({ error: 'Invalid configuration: numeric s1, critical, warning and outage fields are required' });
+  }
+
   fs.writeFile(configPath, JSON.stringify(newConfig, null, 2), err => {
     if (err) {
       console.error('Error saving config file:', err);

@@ -11,6 +11,8 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+// Serve the front-end files located in the FE directory
+app.use(express.static(path.join(__dirname, '../FE')));
 
 // Ensure the uploads directory exists
 const uploadDir = path.join(__dirname, 'uploads');

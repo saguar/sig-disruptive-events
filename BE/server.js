@@ -8,6 +8,7 @@ const app = express();
 const PORT = 3000;
 
 app.use(cors());
+app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Ensure the uploads directory exists
@@ -49,6 +50,26 @@ app.get('/data', (_req, res) => {
       console.error('Error parsing JSON:', parseErr);
       res.status(500).json({ error: 'Invalid JSON format' });
     }
+  });
+});
+
+// Endpoint to save JSON data sent from the frontend
+app.post('/data', (req, res) => {
+  const dataDir = path.join(__dirname, 'data');
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir);
+  }
+
+  const dataPath = path.join(dataDir, 'data.json');
+  const jsonData = req.body;
+
+  fs.writeFile(dataPath, JSON.stringify(jsonData, null, 2), err => {
+    if (err) {
+      console.error('Error saving JSON file:', err);
+      return res.status(500).json({ error: 'Failed to save data' });
+    }
+
+    res.json({ message: 'Data saved successfully' });
   });
 });
 

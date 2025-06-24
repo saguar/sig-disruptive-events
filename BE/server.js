@@ -32,6 +32,26 @@ const csvFilter = (_req, file, cb) => {
 
 const upload = multer({ storage, fileFilter: csvFilter });
 
+// Endpoint to read a JSON file from the data directory
+app.get('/data', (_req, res) => {
+  const dataPath = path.join(__dirname, 'data', 'data.json');
+
+  fs.readFile(dataPath, 'utf8', (err, fileContents) => {
+    if (err) {
+      console.error('Error reading JSON file:', err);
+      return res.status(500).json({ error: 'Failed to read data' });
+    }
+
+    try {
+      const jsonData = JSON.parse(fileContents);
+      res.json(jsonData);
+    } catch (parseErr) {
+      console.error('Error parsing JSON:', parseErr);
+      res.status(500).json({ error: 'Invalid JSON format' });
+    }
+  });
+});
+
 // Endpoint to upload a CSV file
 app.post('/upload', upload.single('file'), (req, res) => {
   if (!req.file) {

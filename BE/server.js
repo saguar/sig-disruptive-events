@@ -150,6 +150,9 @@ app.post('/upload', (req, res) => {
   });
 });
 
+// Handle unknown routes with a JSON 404 response
+app.use((req, res) => res.status(404).json({ error: 'Not found' }));
+
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });

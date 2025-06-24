@@ -42,6 +42,8 @@ csvFileInput.addEventListener('change', (event) => {
     }
 });
 
+// Render the parsed CSV data into the HTML table.
+// `data` is an array of objects where keys match table headers.
 function renderCsvTable(data) {
     csvTable.innerHTML = '';
 
@@ -69,6 +71,9 @@ function renderCsvTable(data) {
     dashboardSection.style.display = 'none';
 }
 
+// Draws a bar chart of monthly totals and a pie chart of disruptive days.
+// `monthlyTotals` is an array of weighted values per month.
+// `workingDays` defines the total working days used for the pie chart.
 function drawCharts(monthlyTotals, workingDays = 252) {
     const months = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
     const barCtx = document.getElementById('barChart').getContext('2d');

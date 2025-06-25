@@ -36,6 +36,7 @@ const storage = multer.diskStorage({
   }
 });
 
+// Rejects non-CSV uploads based on MIME type or `.csv` extension
 const csvFilter = (_req, file, cb) => {
   const isCsv = file.mimetype === 'text/csv' || file.originalname.match(/\.csv$/i);
   cb(isCsv ? null : new Error('Only CSV files are allowed'), isCsv);

@@ -117,7 +117,7 @@
     <script>
     document.getElementById('calcBtn').addEventListener('click', () => {
         const weights = {
-            s1: 1.4,
+            severity1: 1.4,
             critical: 0.15,
             warning: 0.05,
             outage: 2.0
@@ -132,7 +132,7 @@
             const critical = parseFloat(cells[2].textContent) || 0;
             const warning = parseFloat(cells[3].textContent) || 0;
             const outage = parseFloat(cells[4].textContent) || 0;
-            const total = severity1 * weights.s1 +
+            const total = severity1 * weights.severity1 +
                           critical * weights.critical +
                           warning * weights.warning +
                           outage * weights.outage;

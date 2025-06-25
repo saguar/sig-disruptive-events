@@ -66,8 +66,8 @@ app.post('/config', async (req, res, next) => {
   const configPath = path.join(configDir, 'config.json');
   const newConfig = req.body;
 
-  const { s1, critical, warning, outage } = newConfig;
-  const numericFields = [s1, critical, warning, outage];
+  const { severity1, critical, warning, outage } = newConfig;
+  const numericFields = [severity1, critical, warning, outage];
   const isValid = numericFields.every(
     value => typeof value === 'number' && !Number.isNaN(value)
   );
@@ -75,7 +75,7 @@ app.post('/config', async (req, res, next) => {
   if (!isValid) {
     return res
       .status(400)
-      .json({ error: 'Invalid configuration: numeric s1, critical, warning and outage fields are required' });
+      .json({ error: 'Invalid configuration: numeric severity1, critical, warning and outage fields are required' });
   }
 
   try {

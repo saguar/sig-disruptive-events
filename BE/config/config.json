@@ -1,5 +1,5 @@
 {
-  "s1": 1.4,
+  "severity1": 1.4,
   "critical": 0.15,
   "warning": 0.05,
   "outage": 2.0

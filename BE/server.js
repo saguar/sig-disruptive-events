@@ -116,8 +116,13 @@ app.get('/data', (_req, res, next) => {
 // Endpoint to save JSON data sent from the frontend
 app.post('/data', (req, res, next) => {
   const dataDir = path.join(__dirname, 'data');
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir);
+  try {
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir);
+    }
+  } catch (dirErr) {
+    console.error('Error ensuring data directory:', dirErr);
+    return next(dirErr);
   }
 
   const dataPath = path.join(dataDir, 'data.json');
@@ -158,7 +163,12 @@ app.use((req, res) => res.status(404).json({ error: 'Not found' }));
 // Final error handler
 app.use((err, _req, res, _next) => {
   console.error('Unhandled error:', err);
-  res.status(500).json({ error: 'Internal Server Error' });
+  if (res.headersSent) {
+    return;
+  }
+  const status = err.status || 500;
+  const message = status === 500 ? 'Internal Server Error' : err.message;
+  res.status(status).json({ error: message });
 });
 
 app.listen(PORT, () => {

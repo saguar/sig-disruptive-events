@@ -21,6 +21,39 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
 
+// Remove files older than a retention period from the uploads directory
+const UPLOAD_RETENTION_DAYS =
+  parseInt(process.env.UPLOAD_RETENTION_DAYS, 10) || 7;
+const CLEANUP_INTERVAL_MS = 60 * 60 * 1000; // check hourly
+
+async function cleanupUploads() {
+  const retentionMs = UPLOAD_RETENTION_DAYS * 24 * 60 * 60 * 1000;
+  const now = Date.now();
+
+  try {
+    const files = await fsPromises.readdir(uploadDir);
+    await Promise.all(
+      files.map(async file => {
+        const filePath = path.join(uploadDir, file);
+        try {
+          const { mtimeMs } = await fsPromises.stat(filePath);
+          if (now - mtimeMs > retentionMs) {
+            await fsPromises.unlink(filePath);
+          }
+        } catch (err) {
+          console.error('Error cleaning uploaded file:', err);
+        }
+      })
+    );
+  } catch (err) {
+    console.error('Error during uploads cleanup:', err);
+  }
+}
+
+// Run cleanup on startup and then on an interval
+cleanupUploads();
+setInterval(cleanupUploads, CLEANUP_INTERVAL_MS);
+
 // Ensure the config directory exists
 const configDir = path.join(__dirname, 'config');
 if (!fs.existsSync(configDir)) {

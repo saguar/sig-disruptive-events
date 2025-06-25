@@ -56,3 +56,9 @@ Successful response:
 ```
 
 Static files from the `FE` directory are served automatically.
+
+Uploads Cleanup
+---------------
+Saved CSV files in `uploads/` are temporary. An automated task runs once an hour
+and deletes files older than **7 days**. Set the `UPLOAD_RETENTION_DAYS`
+environment variable to adjust how long uploaded files are kept.

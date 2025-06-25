@@ -3,6 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
+const fsPromises = fs.promises;
 
 const app = express();
 // Environment variable overrides the default port
@@ -47,27 +48,21 @@ const upload = multer({
 });
 
 // Endpoint to read the configuration with event weights
-app.get('/config', (_req, res, next) => {
+app.get('/config', async (_req, res, next) => {
   const configPath = path.join(configDir, 'config.json');
 
-  fs.readFile(configPath, 'utf8', (err, fileContents) => {
-    if (err) {
-      console.error('Error reading config file:', err);
-      return next(err);
-    }
-
-    try {
-      const config = JSON.parse(fileContents);
-      res.json(config);
-    } catch (parseErr) {
-      console.error('Error parsing config JSON:', parseErr);
-      next(parseErr);
-    }
-  });
+  try {
+    const fileContents = await fsPromises.readFile(configPath, 'utf8');
+    const config = JSON.parse(fileContents);
+    res.json(config);
+  } catch (err) {
+    console.error('Error reading or parsing config file:', err);
+    next(err);
+  }
 });
 
 // Endpoint to save updated weights to the configuration file
-app.post('/config', (req, res, next) => {
+app.post('/config', async (req, res, next) => {
   const configPath = path.join(configDir, 'config.json');
   const newConfig = req.body;
 
@@ -83,38 +78,34 @@ app.post('/config', (req, res, next) => {
       .json({ error: 'Invalid configuration: numeric s1, critical, warning and outage fields are required' });
   }
 
-  fs.writeFile(configPath, JSON.stringify(newConfig, null, 2), err => {
-    if (err) {
-      console.error('Error saving config file:', err);
-      return next(err);
-    }
-
+  try {
+    await fsPromises.writeFile(
+      configPath,
+      JSON.stringify(newConfig, null, 2)
+    );
     res.json({ message: 'Configuration saved successfully' });
-  });
+  } catch (err) {
+    console.error('Error saving config file:', err);
+    next(err);
+  }
 });
 
 // Endpoint to read a JSON file from the data directory
-app.get('/data', (_req, res, next) => {
+app.get('/data', async (_req, res, next) => {
   const dataPath = path.join(__dirname, 'data', 'data.json');
 
-  fs.readFile(dataPath, 'utf8', (err, fileContents) => {
-    if (err) {
-      console.error('Error reading JSON file:', err);
-      return next(err);
-    }
-
-    try {
-      const jsonData = JSON.parse(fileContents);
-      res.json(jsonData);
-    } catch (parseErr) {
-      console.error('Error parsing JSON:', parseErr);
-      next(parseErr);
-    }
-  });
+  try {
+    const fileContents = await fsPromises.readFile(dataPath, 'utf8');
+    const jsonData = JSON.parse(fileContents);
+    res.json(jsonData);
+  } catch (err) {
+    console.error('Error reading or parsing JSON file:', err);
+    next(err);
+  }
 });
 
 // Endpoint to save JSON data sent from the frontend
-app.post('/data', (req, res, next) => {
+app.post('/data', async (req, res, next) => {
   const dataDir = path.join(__dirname, 'data');
   try {
     if (!fs.existsSync(dataDir)) {
@@ -128,14 +119,13 @@ app.post('/data', (req, res, next) => {
   const dataPath = path.join(dataDir, 'data.json');
   const jsonData = req.body;
 
-  fs.writeFile(dataPath, JSON.stringify(jsonData, null, 2), err => {
-    if (err) {
-      console.error('Error saving JSON file:', err);
-      return next(err);
-    }
-
+  try {
+    await fsPromises.writeFile(dataPath, JSON.stringify(jsonData, null, 2));
     res.json({ message: 'Data saved successfully' });
-  });
+  } catch (err) {
+    console.error('Error saving JSON file:', err);
+    next(err);
+  }
 });
 
 // Endpoint to upload a CSV file
